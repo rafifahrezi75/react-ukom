@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import api from '../api';
 import NavbarAdmin from './navbarAdmin';
+
+import Swal from 'sweetalert2';
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,40 +32,78 @@ ChartJS.register(
 
 const DashboardAdmin = () => {
 
+  const [user, setUser] = useState({});
+
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+
+    if(!token) {
+      navigate('/');
+    } else
+    {
+      fetchData();
+    };
+
+  }, []);
+
+  const fetchData = async () => {
+
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    await api.get('/api/user')
+    .then((response) => {
+
+        setUser(response.data);
+    })
+  };
+
   const [kategoris, setCountKategoris] = useState();
   const [artikels, setArtikels] = useState([]);
   const [countartikels, setCountArtikels] = useState();
   const [komentars, setKomentars] = useState([]);
   const [countkomentars, setCountKomentars] = useState();
+  const [countusers, setCountUsers] = useState();
   
   const countKategoris = async () => {
 
-    await api.get('/api/kategoris')
+    await api.get('/api/indexkategori')
     .then(response => {
         
-        setCountKategoris(response.data.data.data.length);
+        setCountKategoris(response.data.data.length);
     })
 
   };
 
   const countArtikels = async () => {
 
-    await api.get('/api/artikels')
+    await api.get('/api/indexartikel1')
     .then(response => {
         
-      setArtikels(response.data.data.data);
-      setCountArtikels(response.data.data.data.length);
+      setArtikels(response.data.data);
+      setCountArtikels(response.data.data.length);
     })
 
   };
 
   const countKomentars = async () => {
 
-    await api.get('/api/komentars')
+    await api.get('/api/indexkomentar')
     .then(response => {
         
-      setKomentars(response.data.data.data);
-      setCountKomentars(response.data.data.data.length);
+      setKomentars(response.data.data);
+      setCountKomentars(response.data.data.length);
+    })
+
+  };
+
+  const countUsers = async () => {
+
+    await api.get('/api/indexuser')
+    .then(response => {
+      
+      setCountUsers(response.data.data.length);
     })
 
   };
@@ -73,8 +113,27 @@ const DashboardAdmin = () => {
     countKategoris();
     countArtikels();
     countKomentars();
+    countUsers();
 
   }, []);
+
+  const logoutHanlder = async () => {
+
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    
+    await api.post('/api/logout')
+    .then(() => {
+
+        localStorage.removeItem("token");
+
+        navigate('/');
+        Swal.fire(
+          'Success!',
+          'Logout Berhasil !',
+          'success'
+        )
+    });
+  };
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
@@ -184,15 +243,15 @@ const DashboardAdmin = () => {
               </div>
             </div>
             <div className="font-medium text-md flex flex-row">
-                <div className="lg:block hidden mt-0.5">
-                    John Doe
-                    <span className="border-r-4 border-sky-700 ml-2"></span>
-                </div>
-                <div className="ml-2">
-                    <button className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
-                        Logout
-                    </button>
-                </div>
+              <div className="lg:block hidden mt-0.5">
+                  {user.name}
+                  <span className="border-r-4 border-sky-700 ml-2"></span>
+              </div>
+              <div className="ml-2">
+                  <button onClick={logoutHanlder} className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
+                      Logout
+                  </button>
+              </div>
             </div>
           </div>
         </nav>
@@ -240,18 +299,20 @@ const DashboardAdmin = () => {
               </div>
             </div>
           </Link>
-          <div className="flex items-center p-4 bg-white hover:bg-gray-100 duration-500 border rounded-lg overflow-hidden shadow">
-            <div className="p-4 rounded-lg bg-fuchsia-100 text-fuchsia-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-people-fill h-12 w-12" viewBox="0 0 16 16">
-              <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-            </svg>
+          <Link to="/admin/akun">
+            <div className="flex items-center p-4 bg-white hover:bg-gray-100 duration-500 border rounded-lg overflow-hidden shadow">
+              <div className="p-4 rounded-lg bg-fuchsia-100 text-fuchsia-500">
+              <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-people-fill h-12 w-12" viewBox="0 0 16 16">
+                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+              </svg>
 
+              </div>
+              <div className="px-4">
+                <h3 className="text-sm font-medium text-black-600 dark:text-black-400 tracking-wider">Total Akun</h3>
+                <p className="text-xl font-semibold text-black-700 dark:text-black-200">{countusers}</p>
+              </div>
             </div>
-            <div className="px-4">
-              <h3 className="text-sm font-medium text-black-600 dark:text-black-400 tracking-wider">Total Akun</h3>
-              <p className="text-xl font-semibold text-black-700 dark:text-black-200">34</p>
-            </div>
-          </div>
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-3 grid-cols-1 gap-7 md:mt-4 mt-7 mx-4 mb-4 md:mx-8">

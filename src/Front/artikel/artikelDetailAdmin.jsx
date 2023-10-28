@@ -1,12 +1,58 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 import api from '../../api';
 import NavbarAdmin from "../navbarAdmin";
 
+import Swal from "sweetalert2";
 
 const ArtikelDetailAdmin = () => {
+
+  const [user, setUser] = useState({});
+
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+
+      if(!token) {
+      navigate('/');
+      } else
+      {
+      fetchData();
+      };
+
+  }, []);
+
+  const fetchData = async () => {
+
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      await api.get('/api/user')
+      .then((response) => {
+
+          setUser(response.data);
+      })
+  };
+
+  const logoutHanlder = async () => {
+
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      await api.post('/api/logout')
+      .then(() => {
+  
+          localStorage.removeItem("token");
+  
+          navigate('/');
+          Swal.fire(
+              'Success!',
+              'Logout Berhasil !',
+              'success'
+          )
+      });
+  };
 
   const [image, setImage] = useState('');
   const [judul, setJudul] = useState('');
@@ -98,15 +144,15 @@ const ArtikelDetailAdmin = () => {
                 </div>
               </div>
               <div className="font-medium text-md flex flex-row">
-                  <div className="lg:block hidden mt-0.5">
-                      John Doe
-                      <span className="border-r-4 border-sky-700 ml-2"></span>
-                  </div>
-                  <div className="ml-2">
-                      <button className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
-                          Logout
-                      </button>
-                  </div>
+                <div className="lg:block hidden mt-0.5">
+                  {user.name}
+                  <span className="border-r-4 border-sky-700 ml-2"></span>
+                </div>
+                <div className="ml-2">
+                  <button onClick={logoutHanlder} className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
+                    Logout
+                  </button>
+                </div>
               </div>
             </div>
           </nav>

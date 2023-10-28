@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -11,11 +11,54 @@ import NavbarAdmin from '../navbarAdmin';
 
 const KategoriCreate = () => {
 
+    const navigate = useNavigate();
+
+    const [user, setUser] = useState({});
+
+    const token = localStorage.getItem("token");
+
+    useEffect(() => {
+
+        if(!token) {
+        navigate('/');
+        } else
+        {
+        fetchData();
+        };
+
+    }, []);
+
+    const fetchData = async () => {
+
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        await api.get('/api/user')
+        .then((response) => {
+
+            setUser(response.data);
+        })
+    };
+
+    const logoutHanlder = async () => {
+
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        
+        await api.post('/api/logout')
+        .then(() => {
+    
+            localStorage.removeItem("token");
+    
+            navigate('/');
+            Swal.fire(
+                'Success!',
+                'Logout Berhasil !',
+                'success'
+            )
+        });
+    };
+
   const [kategori, setKategori] = useState('');
 
   const [errors, setErrors] = useState([]);
-
-  const navigate = useNavigate();
 
   const storeKategori = async (e) => {
     e.preventDefault();
@@ -94,15 +137,15 @@ const KategoriCreate = () => {
               </div>
               </div>
               <div className="font-medium text-md flex flex-row">
-                  <div className="lg:block hidden mt-0.5">
-                      John Doe
-                      <span className="border-r-4 border-sky-700 ml-2"></span>
-                  </div>
-                  <div className="ml-2">
-                      <button className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
-                          Logout
-                      </button>
-                  </div>
+                <div className="lg:block hidden mt-0.5">
+                  {user.name}
+                  <span className="border-r-4 border-sky-700 ml-2"></span>
+                </div>
+                <div className="ml-2">
+                  <button onClick={logoutHanlder} className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
+                    Logout
+                  </button>
+                </div>
               </div>
           </div>
         </nav>

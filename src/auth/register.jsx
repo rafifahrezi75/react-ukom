@@ -1,7 +1,47 @@
-import React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import api from '../api';
+import Swal from 'sweetalert2';
 
 const Register = () => {
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+    const [errors, setErrors] = useState([]);
+
+    const navigate = useNavigate();
+
+    const registerHandler = async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData();
+
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('password_confirmation', passwordConfirmation);
+
+      await api.post('/api/register', formData)
+      .then(() => {
+          
+          navigate('/');
+          Swal.fire(
+            'Success!',
+            'Register Berhasil !',
+            'success'
+          )
+
+      })
+      .catch(error => {
+          
+          setErrors(error.response.data);
+      })
+  };
+
   return (
     <section className="bg-[#E2E2E2] min-h-screen flex items-center justify-center">
       <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-7 items-center">
@@ -15,11 +55,32 @@ const Register = () => {
             Register
           </h2>
           <p className="text-sm mt-4">If You Already A User, Easily Log In </p>
-          <form action="" className="flex flex-col gap-4">
-            <input type="name" className="w-full mt-4 px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Name" />
-            <input type="email" className="w-full px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Email" />
-            <input type="password" className="w-full px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Password" />
-            <input type="password" className="w-full px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Password Confirmation" />
+          <form onSubmit={registerHandler} className="flex flex-col gap-4">
+            <input type="name" value={name} onChange={(e) => setName(e.target.value)} className="w-full mt-4 px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Name" />
+            {
+              errors.name && (
+                <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                    <span className="font-medium">{errors.name[0]}</span>
+                </div>
+              )
+            }
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Email" />
+            {
+              errors.email && (
+                <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                    <span className="font-medium">{errors.email[0]}</span>
+                </div>
+              )
+            }
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Password" />
+            {
+              errors.password && (
+                <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                    <span className="font-medium">{errors.password[0]}</span>
+                </div>
+              )
+            }
+            <input type="password" value={passwordConfirmation} onChange={(e) => setPasswordConfirmation(e.target.value)} className="w-full px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Password Confirmation" />
             <button className="bg-sky-600 rounded-xl text-white py-2 hover:scale-105 duration-300">Register</button>
           </form>
           <hr className="my-8 border-gray-500" />

@@ -11,7 +11,7 @@ const NavbarAdmin = () => {
   };
 
   return (
-    <div className={`bg-sky-700 lg:static absolute text-white w-40 min-h-screen h-auto lg:rounded-none rounded-br-md flex-shrink-0 duration-500 ${isSidebarOpen ? '-ml-40' : 'ml-0'}`}>
+    <div className={`bg-sky-700 lg:static absolute text-white w-40 lg:min-h-screen h-auto lg:rounded-none rounded-br-md flex-shrink-0 duration-500 ${isSidebarOpen ? '-ml-40' : 'ml-0'}`}>
       <ul className="py-4">
         <div className="ml-2 mt-4 mb-6 flex gap-x-4 items-center">
           <img onClick={toggleSidebar} src={Logo} alt="" className={`cursor-pointer duration-500 ${

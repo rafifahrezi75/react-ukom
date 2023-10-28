@@ -1,8 +1,58 @@
-import React from 'react';
 import NavbarAdmin from '../navbarAdmin';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+import { useNavigate } from 'react-router-dom';
+
+import api from '../../api';
+
+import Swal from 'sweetalert2';
 
 const ProfileAdmin = () => {
+
+    const [user, setUser] = useState({});
+
+    const navigate = useNavigate();
+
+    const token = localStorage.getItem("token");
+
+    useEffect(() => {
+
+        if(!token) {
+        navigate('/');
+        } else
+        {
+        fetchData();
+        };
+
+    }, []);
+
+    const fetchData = async () => {
+
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        await api.get('/api/user')
+        .then((response) => {
+
+            setUser(response.data);
+        })
+    };
+
+    const logoutHanlder = async () => {
+
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        
+        await api.post('/api/logout')
+        .then(() => {
+    
+            localStorage.removeItem("token");
+    
+            navigate('/');
+            Swal.fire(
+                'Success!',
+                'Logout Berhasil !',
+                'success'
+            )
+        });
+    };
 
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
@@ -49,15 +99,15 @@ const ProfileAdmin = () => {
                 </div>
               </div>
               <div className="font-medium text-md flex flex-row">
-                  <div className="lg:block hidden mt-0.5">
-                      John Doe
-                      <span className="border-r-4 border-sky-700 ml-2"></span>
-                  </div>
-                  <div className="ml-2">
-                      <button className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
-                          Logout
-                      </button>
-                  </div>
+                <div className="lg:block hidden mt-0.5">
+                  {user.name}
+                  <span className="border-r-4 border-sky-700 ml-2"></span>
+                </div>
+                <div className="ml-2">
+                  <button onClick={logoutHanlder} className="bg-sky-600 rounded-md text-white px-2 py-0.5 hover:scale-105 duration-300">
+                    Logout
+                  </button>
+                </div>
               </div>
             </div>
           </nav>
@@ -69,11 +119,13 @@ const ProfileAdmin = () => {
                           Profil Saya
                       </h2>
                       <hr />
-                      <div className='flex items-center justify-center'>
-                        <img src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="" className='w-40 h-40 mt-5 rounded-full ' />
-                      </div>
-                      <h1 className="text-center font-bold text-3xl mt-3 text-stone-800">Rizki Topek Tzy</h1>
-                      <p className="text-center text-sm mt-4 text-gray-600">rizkitopektzy552@gmail.com</p>
+                        <span className="inline-flex mx-[443px] my-8 items-center justify-center w-48 h-48 overflow-hidden bg-sky-500 rounded-full dark:bg-gray-600">
+                        <span className="font-medium text-8xl text-white dark:text-gray-300">
+                          {user?.name?.[0] || ''}
+                        </span>
+                        </span>
+                      <h1 className="text-center font-bold text-3xl mt-3 text-stone-800">{user.name}</h1>
+                      <p className="text-center text-sm mt-4 text-gray-600">{user.email}</p>
                   </div>
                 </div>
               </div>

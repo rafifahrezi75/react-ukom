@@ -1,5 +1,4 @@
 import { useParams } from "react-router-dom";
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 import api from '../api';
@@ -7,8 +6,15 @@ import NavbarUser from './navbarUser';
 
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
+import ReplyKomentar from "./komentar/replyKomentar";
 
 const ArtikelDetail = () => {
+
+  const [showReply, setShowReply] = useState(null);
+
+  const handleShowReply = (idartikel) => {
+    setShowReply(idartikel);
+  };
 
   const [image, setImage] = useState('');
   const [judul, setJudul] = useState('');
@@ -44,9 +50,9 @@ const ArtikelDetail = () => {
 
   const fetchDataKomentars = async () => {
 
-    await api.get('/api/komentars')
+    await api.get('/api/indexkomentar')
         .then(response => {
-          setKomentars(response.data.data.data);
+          setKomentars(response.data.data);
         })
 
     }
@@ -70,14 +76,20 @@ const ArtikelDetail = () => {
   }, []);
 
   const getRandomColorClass = () => {
-    const colorClasses = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-amber-500', 'bg-sky-500', 'bg-emerald-500', 'bg-lime-500'];
+    const colorClasses = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-amber-500',
+    'bg-sky-500', 'bg-emerald-500', 'bg-lime-500', 'bg-orange-500', 'bg-teal-500', 'bg-cyan-500', 'bg-indigo-500',
+    'bg-violet-500', 'bg-fuschia-500', 'bg-pink-500', 'bg-rose-500'];
     const randomIndex = Math.floor(Math.random() * colorClasses.length);
     return colorClasses[randomIndex];
   };
 
   const navigate = useNavigate();
 
+  const newRandomNumber = Math.floor(10000 + Math.random() * 90000);
+
   const [idartikel, setIdArtikel] = useState(id);
+  const [idkomen, setIdKomen] = useState(newRandomNumber);
+  const [aksi, setAksi] = useState(0);
   const [nama, setNama] = useState('');
   const [tglkomen, setTglKomen] = useState('');
   const [statuskomen, setStatusKomen] = useState(2);
@@ -91,6 +103,8 @@ const ArtikelDetail = () => {
     const formData = new FormData();
 
     formData.append('idartikel', idartikel);
+    formData.append('idkomen', idkomen);
+    formData.append('aksi', aksi);
     formData.append('nama', nama);
     formData.append('tglkomen', tglkomen);
     formData.append('statuskomen', statuskomen);
@@ -106,7 +120,9 @@ const ArtikelDetail = () => {
               'success'
           )
           
-          window.location.reload(true);
+          setTimeout(() => {
+            window.location.reload(true);
+          }, 1000);
 
         })
         .catch(error => {
@@ -176,12 +192,34 @@ const ArtikelDetail = () => {
       <form onSubmit={storeKomentar} className="m-4 mb-6">
         <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <label htmlFor="idartikel" className="sr-only">ID Artikel</label>
-          <input type="text" onChange={(e) => setIdArtikel(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" value={id} />
+          <input type="text" disabled onChange={(e) => setIdArtikel(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" value={id} />
         </div>
         {
           errors.idartikel && (
             <div className="p-4 mb-4 my-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
                 <span className="font-medium">{errors.idartikel[0]}</span>
+            </div>
+          )
+        }
+        <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <label htmlFor="idkomen" className="sr-only">ID Komen</label>
+          <input type="text" value={newRandomNumber} onChange={(e) => setIdKomen(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="ID Komen" />
+        </div>
+        {
+          errors.idkomen && (
+            <div className="p-4 mb-4 my-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <span className="font-medium">{errors.idkomen[0]}</span>
+            </div>
+          )
+        }
+        <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <label htmlFor="aksi" className="sr-only">Aksi</label>
+          <input type="text" disabled value={0} onChange={(e) => setAksi(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Aksi" />
+        </div>
+        {
+          errors.aksi && (
+            <div className="p-4 mb-4 my-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <span className="font-medium">{errors.aksi[0]}</span>
             </div>
           )
         }
@@ -198,7 +236,7 @@ const ArtikelDetail = () => {
         }
         <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <label htmlFor="tglkomen" className="sr-only">Tanggal</label>
-          <input type="date" disabled value={tgl} onChange={(e) => setTglKomen(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tanggal" />
+          <input type="date" disabled value={tglkomen} onChange={(e) => setTglKomen(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tanggal" />
         </div>
         {
           errors.tglkomen && (
@@ -209,7 +247,7 @@ const ArtikelDetail = () => {
         }
         <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <label htmlFor="statuskomen" className="sr-only">Status Komen</label>
-          <input type="text" onChange={(e) => setStatusKomen(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="StatusKomen" Value={2} />
+          <input type="text" disabled onChange={(e) => setStatusKomen(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="StatusKomen" Value={2} />
         </div>
         {
           errors.statuskomen && (
@@ -220,7 +258,7 @@ const ArtikelDetail = () => {
         }
         <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <label htmlFor="komentar" className="sr-only">Komentar Anda</label>
-          <textarea id="komentar"  onChange={(e) => setKomentar(e.target.value)} rows={6} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tulis sebuah komentar..." />
+          <textarea id="komentar" onChange={(e) => setKomentar(e.target.value)} rows={6} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tulis sebuah komentar..." />
         </div>
         {
           errors.komentar && (
@@ -235,15 +273,22 @@ const ArtikelDetail = () => {
       </form>
     </div>
 
-    <div className="mx-5 mt-6 flex justify-between items-center mb-6">
-      <h2 className="mt-4 text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Semua Komentar</h2>
-    </div>
+    { komentars.filter(
+        komentars => komentars.idartikel === parseInt(id) && komentars.statuskomen === 3 && komentars.aksi === 0
+      ).length > 0 && (
+        <div className="mx-5 mt-6 flex justify-between items-center mb-6">
+          <h2 className="mt-4 text-lg lg:text-2xl font-bold text-gray-900 dark:text-white">Semua Komentar</h2>
+        </div>
+      )
+    }
 
     {
       komentars.filter(
-        komentars => komentars.idartikel === parseInt(id) && komentars.statuskomen === 3
+        komentars => komentars.idartikel === parseInt(id) && komentars.statuskomen === 3 && komentars.aksi === 0
       ).map((komentars, index) => (
-        <article key={index} className="p-6 m-4 text-base bg-white rounded-lg dark:bg-gray-900">
+        <>
+
+        <article className="p-6 m-4 text-base bg-white rounded-lg dark:bg-gray-900">
           <footer className="flex justify-between items-center mb-2">
             <div className="flex items-center">
               <p className="inline-flex items-center mr-3 text-sm text-stone-800 dark:text-white font-semibold">
@@ -258,14 +303,20 @@ const ArtikelDetail = () => {
             {komentars.komentar}
           </p>
           <div className="flex items-center mt-4 space-x-4">
-            <button type="button" className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium">
+            <button onClick={() => handleShowReply(komentars.idkomen)} type="button" className="flex items-center text-sm text-gray-500 hover:underline dark:text-gray-400 font-medium">
               <svg className="mr-1.5 w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
               </svg>                
-              Reply
+              Show Reply
             </button>
           </div>
         </article>
+        {showReply === komentars.idkomen && (
+          <>
+            <ReplyKomentar namas={komentars.nama} idkomens={komentars.idkomen} idartikels={komentars.idartikel} />
+          </>
+        )}
+        </>
       ))
     }
 
