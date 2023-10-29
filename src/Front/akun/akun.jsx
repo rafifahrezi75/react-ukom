@@ -18,6 +18,19 @@ const Akun = () => {
 
     useEffect(() => {
 
+        const fetchData = async () => {
+
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+          await api.get('/api/user')
+          .then((response) => {
+
+              setUser(response.data);
+              if (response.data.role === 'user') {
+                navigate('/dashboard');
+              };
+          })
+        };
+
         if(!token) {
         navigate('/');
         } else
@@ -26,16 +39,6 @@ const Akun = () => {
         };
 
     }, []);
-
-    const fetchData = async () => {
-
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        await api.get('/api/user')
-        .then((response) => {
-
-            setUser(response.data);
-        })
-    };
 
     const logoutHanlder = async () => {
 
@@ -165,6 +168,7 @@ const Akun = () => {
                         <tr>
                           <th scope="col" className="px-6 py-3">Akun</th>
                           <th scope="col" className="px-6 py-3">Email</th>
+                          <th scope="col" className="px-6 py-3">Role</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y bg-white text-left divide-gray-200 dark:divide-gray-700">
@@ -192,6 +196,11 @@ const Akun = () => {
                                       <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm leading-none text-gray-600">
                                           {users.email}
+                                        </div>
+                                      </td>
+                                      <td className="px-6 py-4 uppercase whitespace-nowrap">
+                                        <div className="text-sm leading-none text-gray-600">
+                                          {users.role}
                                         </div>
                                       </td>
                                   </tr>

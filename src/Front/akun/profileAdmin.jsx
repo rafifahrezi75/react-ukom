@@ -17,6 +17,19 @@ const ProfileAdmin = () => {
 
     useEffect(() => {
 
+      const fetchData = async () => {
+
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+        await api.get('/api/user')
+        .then((response) => {
+
+            setUser(response.data);
+            if (response.data.role === 'user') {
+              navigate('/dashboard');
+            };
+        })
+      };
+
         if(!token) {
         navigate('/');
         } else
@@ -25,17 +38,7 @@ const ProfileAdmin = () => {
         };
 
     }, []);
-
-    const fetchData = async () => {
-
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        await api.get('/api/user')
-        .then((response) => {
-
-            setUser(response.data);
-        })
-    };
-
+    
     const logoutHanlder = async () => {
 
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`

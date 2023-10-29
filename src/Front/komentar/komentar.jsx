@@ -15,6 +15,19 @@ const Komentar = () => {
 
     useEffect(() => {
 
+        const fetchData = async () => {
+
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+          await api.get('/api/user')
+          .then((response) => {
+
+              setUser(response.data);
+              if (response.data.role === 'user') {
+                navigate('/dashboard');
+              };
+          })
+        };
+
         if(!token) {
         navigate('/');
         } else
@@ -23,16 +36,6 @@ const Komentar = () => {
         };
 
     }, []);
-
-    const fetchData = async () => {
-
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-        await api.get('/api/user')
-        .then((response) => {
-
-            setUser(response.data);
-        })
-    };
 
     const logoutHanlder = async () => {
 
@@ -188,7 +191,7 @@ const Komentar = () => {
                     </div>
                     <input
                     onChange={(e) => setSearch(e.target.value)}
-                    type="text" id="search-nama" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari nama..." required />
+                    type="search" id="search-nama" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari nama..." required />
                   </div>
                 </form>
                 
@@ -238,13 +241,13 @@ const Komentar = () => {
                                   filterStatus !== '' ? item.statuskomen === filterStatus : item
                                 :
                                 (item) => {
-                                  return search.toLowerCase() === '' ? item : item.nama.toLowerCase().includes(search)
+                                  return search.toLowerCase() === '' ? item : item.name.toLowerCase().includes(search)
                                 }
                               ).map((komentars, index) => (
                                       <tr key={index}>
                                           <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm leading-none text-gray-600 font-medium dark:text-gray-200">
-                                              {komentars.nama}
+                                              {komentars.name}
                                             </div>
                                           </td>
                                           <td className="px-6 py-4 whitespace-nowrap">  

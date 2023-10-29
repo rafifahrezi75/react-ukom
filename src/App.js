@@ -20,12 +20,17 @@ import TerbaruArtikel from "./Front/terbaru/terbaruArtikel";
 import Akun from "./Front/akun/akun";
 import UtamaArtikel from "./Front/utama/utamaArtikel";
 import ProfileAdmin from "./Front/akun/profileAdmin";
+import RegisterUser from "./auth/registerUser";
+import LoginUser from "./auth/loginUser";
+import HistoryKomentar from "./Front/frontuser/historyKomentar";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
+      <Route path="/loginuser" element={<LoginUser />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/registeruser" element={<RegisterUser />} />
       <Route path="/admin/dashboard" element={<DashboardAdmin />} />
 
       <Route path="/admin/kategoris" element={<Kategori />} />
@@ -54,6 +59,7 @@ function App() {
       <Route path="/artikel" element={<AllArtikel />} />
       <Route path="/artikel/detail/:id" element={<ArtikelDetail />} />
       <Route path="/about" element={<AboutUser />} />
+      <Route path="/historykomentar" element={<HistoryKomentar />} />
 
     </Routes>
   );

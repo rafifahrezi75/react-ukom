@@ -6,7 +6,7 @@ import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 
-const ReplyKomentar = ({ namas, idkomens, idartikels }) => {
+const ReplyKomentar = ({ token, userid, namas, idkomens, idartikels }) => {
 
   const [komentars, setKomentars] = useState([]);
 
@@ -41,15 +41,18 @@ const ReplyKomentar = ({ namas, idkomens, idartikels }) => {
   }, []);
 
   const getRandomColorClass = () => {
-    const colorClasses = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-amber-500', 'bg-sky-500', 'bg-emerald-500', 'bg-lime-500'];
+    const colorClasses = ['bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500',
+    'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-indigo-500',' bg-violet-500',
+    'bg-purple-500', 'bg-fuchsia-500', 'bg-pink-500', 'bg-rose-500'];
     const randomIndex = Math.floor(Math.random() * colorClasses.length);
     return colorClasses[randomIndex];
   };
 
+
   const [idartikel, setIdArtikel] = useState(idartikels);
   const [idkomen, setIdKomen] = useState(idkomens);
   const [aksi, setAksi] = useState(1);
-  const [nama, setNama] = useState('');
+  const [iduser, setIdUser] = useState(userid);
   const [tglkomen, setTglKomen] = useState('');
   const [statuskomen, setStatusKomen] = useState(2);
   const [komentar, setKomentar] = useState('');
@@ -57,37 +60,45 @@ const ReplyKomentar = ({ namas, idkomens, idartikels }) => {
   const [errors, setErrors] = useState([]);
 
   const storeKomentar = async (e) => {
+    
     e.preventDefault();
     
-    const formData = new FormData();
-
-    formData.append('idartikel', idartikel);
-    formData.append('idkomen', idkomen);
-    formData.append('aksi', aksi);
-    formData.append('nama', nama);
-    formData.append('tglkomen', tglkomen);
-    formData.append('statuskomen', statuskomen);
-    formData.append('komentar', komentar);
-
-    await api.post('/api/komentars', formData)
-        .then(() => {
-            
-            navigate(`/artikel/detail/${id}`);
-            Swal.fire(
-              'Success!',
-              'Komentar Berhasil Dikirim!',
-              'success'
-          )
-          
-          setTimeout(() => {
-            window.location.reload(true);
-          }, 1000);
-
-        })
-        .catch(error => {
-            
-            setErrors(error.response.data);
-        })
+    if (token) {
+      const formData = new FormData();
+  
+      formData.append('idartikel', idartikel);
+      formData.append('idkomen', idkomen);
+      formData.append('aksi', aksi);
+      formData.append('iduser', iduser);
+      formData.append('tglkomen', tglkomen);
+      formData.append('statuskomen', statuskomen);
+      formData.append('komentar', komentar);
+  
+      try {
+        await api.post('/api/komentars', formData);
+        navigate(`/artikel/detail/${id}`);
+        Swal.fire(
+          'Success!',
+          'Komentar Berhasil Dikirim!',
+          'success'
+        );
+        
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1000);
+      } catch (error) {
+        setErrors(error.response.data);
+      }
+    } else {
+      setTimeout(() => {
+        navigate('/loginuser');
+        Swal.fire(
+          'Warning!',
+          'Anda Harus Login Terlebih dahulu!',
+          'warning'
+        );
+      }, 1000)
+    }
   };
 
   const [activeClass, setActiveClass] = useState("hidden");
@@ -121,9 +132,9 @@ const ReplyKomentar = ({ namas, idkomens, idartikels }) => {
               <div className="flex items-center">
                 <p className="inline-flex items-center mr-3 text-sm text-stone-800 dark:text-white font-semibold">
                     <span className={`relative inline-flex items-center mr-2 justify-center w-10 h-10 overflow-hidden ${getRandomColorClass()} rounded-full dark:bg-gray-600`}>
-                      <span className="font-medium text-white dark:text-gray-300">{komentars.nama[0]}</span>
+                      <span className="font-medium text-white dark:text-gray-300">{komentars.name[0]}</span>
                     </span>
-                    {komentars.nama}</p>
+                    {komentars.name}</p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">{komentars.tglkomen}</p>
               </div>
             </footer>
@@ -180,14 +191,14 @@ const ReplyKomentar = ({ namas, idkomens, idartikels }) => {
               </div>
             )
           }
-          <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <label htmlFor="nama" className="sr-only">Nama</label>
-            <input type="text" onChange={(e) => setNama(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Nama anda" />
+          <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+            <label htmlFor="iduser" className="sr-only">Iduser</label>
+            <input type="text" value={iduser} onChange={(e) => setIdUser(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="ID User" />
           </div>
           {
-            errors.nama && (
+            errors.iduser && (
               <div className="p-4 mb-4 my-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                  <span className="font-medium">{errors.nama[0]}</span>
+                  <span className="font-medium">{errors.iduser[0]}</span>
               </div>
             )
           }

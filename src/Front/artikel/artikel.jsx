@@ -17,24 +17,27 @@ const Artikel = () => {
 
   useEffect(() => {
 
-      if(!token) {
-      navigate('/');
-      } else
-      {
-      fetchData();
-      };
-
-  }, []);
-
-  const fetchData = async () => {
+    const fetchData = async () => {
 
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`
       await api.get('/api/user')
       .then((response) => {
 
           setUser(response.data);
+          if (response.data.role === 'user') {
+            navigate('/dashboard');
+        };
       })
-  };
+    };
+
+    if(!token) {
+    navigate('/');
+    } else
+    {
+    fetchData();
+    };
+
+  }, []);
 
   const logoutHanlder = async () => {
 
@@ -215,7 +218,7 @@ const Artikel = () => {
                   </div>
                   <input
                   onChange={(e) => setSearch(e.target.value)}
-                  type="text" id="search-artikels" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari artikel..." required />
+                  type="search" id="search-artikels" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari artikel..." required />
                 </div>
               </form>
             </div>

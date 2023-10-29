@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import Swal from 'sweetalert2';
 
-const Register = () => {
+const RegisterUser = () => {
 
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("admin");
+    const [role, setRole] = useState("user");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
     const [errors, setErrors] = useState([]);
@@ -30,7 +30,7 @@ const Register = () => {
       await api.post('/api/register', formData)
       .then(() => {
           
-          navigate('/');
+          navigate('/loginuser');
           Swal.fire(
             'Success!',
             'Register Berhasil !',
@@ -110,4 +110,4 @@ const Register = () => {
   );
 }
 
-export default Register;
+export default RegisterUser;

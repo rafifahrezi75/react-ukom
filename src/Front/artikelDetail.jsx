@@ -2,13 +2,41 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from 'react';
 
 import api from '../api';
-import NavbarUser from './navbarUser';
 
 import { useNavigate } from 'react-router-dom';
-import Swal from "sweetalert2";
+import { Link } from 'react-router-dom';
+
+import Logo from "../assets/logo.png";
+
+import Swal from 'sweetalert2';
 import ReplyKomentar from "./komentar/replyKomentar";
+import axios from "axios";
 
 const ArtikelDetail = () => {
+
+  const token = localStorage.getItem("token");
+  const [user, setUser] = useState({})
+  const { id } = useParams();
+  const [liked, setLiked] = useState(false);
+  const [idartikel, setIdArtikel] = useState(id);
+
+  useEffect(() => {
+    // Lakukan permintaan ke server untuk memeriksa apakah pengguna sudah menyukai artikel ini.
+    if(token) {
+      const formData = new FormData();
+      formData.append('idartikel', idartikel);
+      formData.append('iduser', user.id);
+
+      axios.post('http://127.0.0.1:8000/api/checklike', formData)
+        .then((response) => {
+          const { liked } = response.data;
+          setLiked(liked);  
+        })
+        .catch((error) => {
+          console.error('Error checking like status:', error);
+        });
+      }
+  }, [idartikel, user.id]);
 
   const [showReply, setShowReply] = useState(null);
 
@@ -18,6 +46,7 @@ const ArtikelDetail = () => {
 
   const [image, setImage] = useState('');
   const [judul, setJudul] = useState('');
+  const [iduser, setIdUser] = useState(null);
   const [kategori, setKategori] = useState('');
   const [tgl, setTgl] = useState('');
   const [penulis, setPenulis] = useState('');
@@ -25,8 +54,6 @@ const ArtikelDetail = () => {
   const [para2, setPara2] = useState('');
   const [para3, setPara3] = useState('');
   const [para4, setPara4] = useState('');
-
-  const { id } = useParams();
 
   const fetchDetailArtikel= async () => {
         
@@ -69,6 +96,18 @@ const ArtikelDetail = () => {
 
     const today = getTodayDate();
     setTglKomen(today);
+
+    if (token) {
+      const fetchData = async () => {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        await api.get('/api/user').then((response) => {
+          setUser(response.data);
+          setIdUser(response.data.id);
+        });
+      };
+  
+      fetchData();
+    };
       
     fetchDetailArtikel();
     fetchDataKomentars();
@@ -76,9 +115,9 @@ const ArtikelDetail = () => {
   }, []);
 
   const getRandomColorClass = () => {
-    const colorClasses = ['bg-red-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-amber-500',
-    'bg-sky-500', 'bg-emerald-500', 'bg-lime-500', 'bg-orange-500', 'bg-teal-500', 'bg-cyan-500', 'bg-indigo-500',
-    'bg-violet-500', 'bg-fuschia-500', 'bg-pink-500', 'bg-rose-500'];
+    const colorClasses = ['bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500',
+    'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-indigo-500',' bg-violet-500',
+    'bg-purple-500', 'bg-fuchsia-500', 'bg-pink-500', 'bg-rose-500'];
     const randomIndex = Math.floor(Math.random() * colorClasses.length);
     return colorClasses[randomIndex];
   };
@@ -87,10 +126,8 @@ const ArtikelDetail = () => {
 
   const newRandomNumber = Math.floor(10000 + Math.random() * 90000);
 
-  const [idartikel, setIdArtikel] = useState(id);
   const [idkomen, setIdKomen] = useState(newRandomNumber);
   const [aksi, setAksi] = useState(0);
-  const [nama, setNama] = useState('');
   const [tglkomen, setTglKomen] = useState('');
   const [statuskomen, setStatusKomen] = useState(2);
   const [komentar, setKomentar] = useState('');
@@ -98,43 +135,192 @@ const ArtikelDetail = () => {
   const [errors, setErrors] = useState([]);
 
   const storeKomentar = async (e) => {
+    
     e.preventDefault();
     
-    const formData = new FormData();
+    if (token) {
+      const formData = new FormData();
+  
+      formData.append('idartikel', idartikel);
+      formData.append('idkomen', idkomen);
+      formData.append('aksi', aksi);
+      formData.append('iduser', iduser);
+      formData.append('tglkomen', tglkomen);
+      formData.append('statuskomen', statuskomen);
+      formData.append('komentar', komentar);
+  
+      try {
+        await api.post('/api/komentars', formData);
+        navigate(`/artikel/detail/${id}`);
+        Swal.fire(
+          'Success!',
+          'Komentar Berhasil Dikirim!',
+          'success'
+        );
+        
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 1000);
+      } catch (error) {
+        setErrors(error.response.data);
+      }
+    } else {
+      setTimeout(() => {
+        navigate('/loginuser');
+        Swal.fire(
+          'Warning!',
+          'Anda Harus Login Terlebih dahulu!',
+          'warning'
+        );
+      }, 1000)
+    }
+  };
 
-    formData.append('idartikel', idartikel);
-    formData.append('idkomen', idkomen);
-    formData.append('aksi', aksi);
-    formData.append('nama', nama);
-    formData.append('tglkomen', tglkomen);
-    formData.append('statuskomen', statuskomen);
-    formData.append('komentar', komentar);
+  const logoutHandler = async () => {
 
-    await api.post('/api/komentars', formData)
-        .then(() => {
-            
-            navigate(`/artikel/detail/${id}`);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    
+    await api.post('/api/logout')
+    .then(() => {
+
+        localStorage.removeItem("token");
+
+        navigate('/dashboard');
+        Swal.fire(
+            'Success!',
+            'Logout Berhasil !',
+            'success'
+        )
+    });
+  };
+
+  const [ isOpen, setisOpen ] = useState(false);
+
+  const handleLike = () => {
+
+      if(token) {
+        const formData = new FormData();
+  
+        formData.append('idartikel', idartikel);
+        formData.append('iduser', user.id);
+
+        axios.post('http://127.0.0.1:8000/api/like', formData)
+          .then(() => {
+            setLiked(true);
             Swal.fire(
               'Success!',
-              'Komentar Berhasil Dikirim!',
+              'Like Berhasil !',
               'success'
-          )
-          
-          setTimeout(() => {
-            window.location.reload(true);
-          }, 1000);
+            )
+          })
+          .catch((error) => {
+            console.error('Error liking article:', error);
+          });
+      } else {
+        setTimeout(() => {
+          navigate('/loginuser');
+          Swal.fire(
+            'Warning!',
+            'Anda Harus Login Terlebih dahulu!',
+            'warning'
+          );
+        }, 1000)
+      }
+  };
 
+  const handleUnlike = () => {
+
+    if(token) {
+      const formData = new FormData();
+  
+      formData.append('idartikel', idartikel);
+      formData.append('iduser', user.id);
+
+       // Buat permintaan ke server untuk unlike artikel ini
+      axios.post('http://127.0.0.1:8000/api/unlike', formData)
+        .then(() => {
+          setLiked(false);
+          Swal.fire(
+            'Success!',
+            'Unlike Berhasil !',
+            'success'
+          )
         })
-        .catch(error => {
-            
-            setErrors(error.response.data);
-        })
+        .catch((error) => {
+          console.error('Error unliking article:', error);
+        });
+    } else {
+      setTimeout(() => {
+        navigate('/loginuser');
+        Swal.fire(
+          'Warning!',
+          'Anda Harus Login Terlebih dahulu!',
+          'warning'
+        );
+      }, 1000)
+    }
   };
 
   return (
     <>
 
-    <NavbarUser />
+    <div className="w-full mx-auto">
+      <div className="bg-sky-700 border-gray-200 dark:bg-gray-900 lg:shadow">
+        <div className="flex flex-col lg:flex-row">
+          <div className="flex items-center justify-between px-8 py-4 border-b border-gray-100 lg:border-b-0">
+              <div className="flex flex-row space-x-2">
+                <img src={Logo} className="w-7 h-7 mt-0.5" alt="" />
+                <Link to="/dashboard">
+                  <span className="self-center text-2xl font-semibold whitespace-nowrap text-white dark:text-white">INKEL</span>
+                </Link>
+              </div>
+              <div>
+                  <button onClick={() => setisOpen(!isOpen)} className="focus:outline-none text-dark-500 block lg:hidden">
+                      <svg className="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                          <path className={!isOpen ? 'block' : 'hidden'} strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                          <path className={isOpen ? 'block' : 'hidden'} strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                  </button>
+              </div>
+          </div>
+
+          <div className={`${isOpen ? 'block' : 'hidden'} items-center lg:flex flex-col lg:flex-row justify-between w-full py-4 lg:px-8 lg:py-0`}>
+              <div className="flex flex-col lg:flex-row">
+                  
+              </div>  
+              <div className="flex flex-col lg:flex-row">
+                  <Link to="/dashboard">
+                    <div className="text-white block px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Dashboard</div>
+                  </Link>
+                  <Link to="/artikel">
+                    <div className="text-white block px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Artikel</div>
+                  </Link>
+                  <Link to="/about">
+                    <div className="text-white px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Tentang</div>
+                  </Link>
+                  {
+                    token ? (
+                      <Link to="/historykomentar">
+                        <div className="text-white px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Komentar</div>
+                      </Link>
+                      ) : (
+                      null
+                    )
+                  }
+                  {
+                    token ? (
+                      <button onClick={logoutHandler} className="bg-sky-600 rounded-md text-white my-3 px-2 py-0.5 lg:hover:scale-105 duration-300">
+                          Logout
+                      </button>
+                      ) : (
+                      null
+                    )
+                  }
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <div className="m-4 p-4 bg-white rounded-md shadow dark:border-gray-700 dark:shadow-gray-900">
       <div className="border-l-4 border-emerald-500 bg-neutral-50 rounded-r-lg">
@@ -163,7 +349,7 @@ const ArtikelDetail = () => {
         </p>
       </div>
 
-      <div className="flex md:flex-row flex-col items-center text-center justify-between bg-neutral-100 rounded-md">
+      <div className="flex md:flex-row flex-col items-center text-center justify-between bg-neutral-100 rounded-t-md">
         <div className="flex m-4">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-[#333333] bi bi-person" viewBox="0 0 16 16">
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
@@ -178,6 +364,24 @@ const ArtikelDetail = () => {
           <p className="font-medium text-stone-800 dark:text-white">
             {tgl}
           </p>
+        </div>
+      </div>
+      <div className="flex md:flex-row flex-col items-center text-center justify-between bg-neutral-100 rounded-b-md">
+        <div className="flex m-4">
+          {liked ? (
+              <button onClick={handleUnlike} className="inline-flex items-center justify-center w-10 h-10 text-sky-100 transition-colors duration-150 bg-sky-700 rounded-md focus:shadow-outline hover:bg-sky-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart-fill" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                </svg>
+              </button>
+            ) : (
+              <button onClick={handleLike} className="inline-flex items-center justify-center w-10 h-10 text-sky-100 transition-colors duration-150 bg-sky-700 rounded-md focus:shadow-outline hover:bg-sky-800">
+                <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart" viewBox="0 0 16 16">
+                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                </svg>
+              </button>
+            )
+          }
         </div>
       </div>
     </div>
@@ -223,14 +427,14 @@ const ArtikelDetail = () => {
             </div>
           )
         }
-        <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <label htmlFor="nama" className="sr-only">Nama</label>
-          <input type="text" onChange={(e) => setNama(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Nama anda" />
+        <div hidden className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <label htmlFor="iduser" className="sr-only">ID User</label>
+          <input type="text" value={user.id} onChange={(e) => setIdUser(e.target.value)} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Nama anda" />
         </div>
         {
-          errors.nama && (
+          errors.iduser && (
             <div className="p-4 mb-4 my-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                <span className="font-medium">{errors.nama[0]}</span>
+                <span className="font-medium">{errors.iduser[0]}</span>
             </div>
           )
         }
@@ -293,9 +497,9 @@ const ArtikelDetail = () => {
             <div className="flex items-center">
               <p className="inline-flex items-center mr-3 text-sm text-stone-800 dark:text-white font-semibold">
                   <span className={`relative inline-flex items-center mr-2 justify-center w-10 h-10 overflow-hidden ${getRandomColorClass()} rounded-full dark:bg-gray-600`}>
-                    <span className="font-medium text-white dark:text-gray-300">{komentars.nama[0]}</span>
+                    <span className="font-medium text-white dark:text-gray-300">{komentars.name[0]}</span>
                   </span>
-                  {komentars.nama}</p>
+                  {komentars.name}</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">{komentars.tglkomen}</p>
             </div>
           </footer>
@@ -313,7 +517,7 @@ const ArtikelDetail = () => {
         </article>
         {showReply === komentars.idkomen && (
           <>
-            <ReplyKomentar namas={komentars.nama} idkomens={komentars.idkomen} idartikels={komentars.idartikel} />
+            <ReplyKomentar token={token} userid={user.id} namas={komentars.name} idkomens={komentars.idkomen} idartikels={komentars.idartikel} />
           </>
         )}
         </>
