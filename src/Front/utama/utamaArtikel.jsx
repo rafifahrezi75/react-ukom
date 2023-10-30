@@ -9,11 +9,12 @@ import Swal from 'sweetalert2';
 
 const UtamaArtikel = () => {
 
+  const token = localStorage.getItem("token");
+  const roles = localStorage.getItem("roles");
+
   const [user, setUser] = useState({});
 
   const navigate = useNavigate();
-
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
 
@@ -24,11 +25,12 @@ const UtamaArtikel = () => {
         .then((response) => {
 
             setUser(response.data);
-            if (response.data.role === 'user') {
-              navigate('/dashboard');
-            };
         })
       };
+
+      if(roles) {
+        navigate('/dashboard');
+      }
 
       if(!token) {
       navigate('/');

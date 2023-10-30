@@ -83,9 +83,7 @@ const ReplyKomentar = ({ token, userid, namas, idkomens, idartikels }) => {
           'success'
         );
         
-        setTimeout(() => {
-          window.location.reload(true);
-        }, 1000);
+        setKomentar('');
       } catch (error) {
         setErrors(error.response.data);
       }
@@ -226,7 +224,7 @@ const ReplyKomentar = ({ token, userid, namas, idkomens, idartikels }) => {
           }
           <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <label htmlFor="komentar" className="sr-only">Komentar Anda</label>
-            <textarea id="komentar"  onChange={(e) => setKomentar(e.target.value)} rows={6} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tulis sebuah komentar..." />
+            <textarea id="komentar" value={komentar} onChange={(e) => setKomentar(e.target.value)} rows={6} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tulis sebuah komentar..." />
           </div>
           {
             errors.komentar && (

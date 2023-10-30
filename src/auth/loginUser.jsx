@@ -40,6 +40,7 @@ const LoginUser = () => {
       .then((response) => {
 
           localStorage.setItem('token', response.data.token);
+          localStorage.setItem('roles', response.data.role);
 
           const role = response.data.role;
 

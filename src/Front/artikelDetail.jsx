@@ -20,6 +20,37 @@ const ArtikelDetail = () => {
   const [idartikel, setIdArtikel] = useState(id);
 
   useEffect(() => {
+
+    fetchDetailArtikel();
+    fetchDataKomentars();
+    fetchDataLikes();
+
+    const getTodayDate = () => {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0');
+      const day = today.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    const today = getTodayDate();
+    setTglKomen(today);
+
+    if (token) {
+      const fetchData = async () => {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        await api.get('/api/user').then((response) => {
+          setUser(response.data);
+          setIdUser(response.data.id);
+        });
+      };
+  
+      fetchData();
+    };
+
+  }, []);
+
+  useEffect(() => {
     // Lakukan permintaan ke server untuk memeriksa apakah pengguna sudah menyukai artikel ini.
     if(token) {
       const formData = new FormData();
@@ -97,37 +128,6 @@ const ArtikelDetail = () => {
   const filteredLikesID = likes.filter(likes => likes.idartikel === parseInt(id));
   const totalLikesCount = filteredLikesID.length;
 
-  useEffect(() => {
-
-    const getTodayDate = () => {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = (today.getMonth() + 1).toString().padStart(2, '0');
-      const day = today.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
-    const today = getTodayDate();
-    setTglKomen(today);
-
-    if (token) {
-      const fetchData = async () => {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        await api.get('/api/user').then((response) => {
-          setUser(response.data);
-          setIdUser(response.data.id);
-        });
-      };
-  
-      fetchData();
-    };
-      
-    fetchDetailArtikel();
-    fetchDataKomentars();
-    fetchDataLikes();
-
-  }, []);
-
   const getRandomColorClass = () => {
     const colorClasses = ['bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500',
     'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-indigo-500',' bg-violet-500',
@@ -171,10 +171,8 @@ const ArtikelDetail = () => {
           'Komentar Berhasil Dikirim!',
           'success'
         );
-        
-        setTimeout(() => {
-          window.location.reload(true);
-        }, 1000);
+
+        setKomentar('');
       } catch (error) {
         setErrors(error.response.data);
       }
@@ -198,6 +196,7 @@ const ArtikelDetail = () => {
     .then(() => {
 
         localStorage.removeItem("token");
+        localStorage.removeItem("roles");
 
         navigate('/dashboard');
         Swal.fire(
@@ -226,6 +225,7 @@ const ArtikelDetail = () => {
               'Like Berhasil !',
               'success'
             )
+            fetchDataLikes();
           })
           .catch((error) => {
             console.error('Error liking article:', error);
@@ -259,6 +259,7 @@ const ArtikelDetail = () => {
             'Unlike Berhasil !',
             'success'
           )
+          fetchDataLikes();
         })
         .catch((error) => {
           console.error('Error unliking article:', error);
@@ -372,7 +373,7 @@ const ArtikelDetail = () => {
         </p>
       </div>
 
-      <div className="flex md:flex-row flex-col items-center text-center justify-between bg-neutral-100 rounded-t-md">
+      <div className="flex flex-row items-center text-center justify-between bg-neutral-100 rounded-t-md">
         <div className="flex m-4">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-[#333333] bi bi-person" viewBox="0 0 16 16">
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
@@ -384,12 +385,12 @@ const ArtikelDetail = () => {
             <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z" />
             <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
           </svg>
-          <p className="font-medium text-stone-800 dark:text-white">
+          <p className="font-medium text-[rgb(51,51,51)] dark:text-white">
             {tgl}
           </p>
         </div>
       </div>
-      <div className="flex md:flex-row flex-col items-center text-center justify-between bg-neutral-100 rounded-b-md">
+      <div className="flex flex-row items-center text-center justify-between bg-neutral-100 rounded-b-md">
         <div className="flex m-4">
           {liked ? (
               <button onClick={handleUnlike} className="inline-flex items-center justify-center w-10 h-10 text-sky-100 transition-colors duration-150 bg-sky-700 rounded-md focus:shadow-outline hover:bg-sky-800">
@@ -407,7 +408,12 @@ const ArtikelDetail = () => {
           }
         </div>
         <div className="flex m-4">
-          {totalLikesCount}
+          <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart w-5 h-5 mr-2 text-[rgb(51,51,51)] dark:text-white" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+          </svg>
+          <p className="text-[rgb(51,51,51)] dark:text-white">
+            {totalLikesCount} Likes
+          </p>
         </div>
       </div>
     </div>
@@ -488,7 +494,7 @@ const ArtikelDetail = () => {
         }
         <div className="py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <label htmlFor="komentar" className="sr-only">Komentar Anda</label>
-          <textarea id="komentar" onChange={(e) => setKomentar(e.target.value)} rows={6} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tulis sebuah komentar..." />
+          <textarea id="komentar" value={komentar} onChange={(e) => setKomentar(e.target.value)} rows={6} className="px-0 w-full text-sm text-gray-900 border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-400 dark:bg-gray-800" placeholder="Tulis sebuah komentar..." />
         </div>
         {
           errors.komentar && (

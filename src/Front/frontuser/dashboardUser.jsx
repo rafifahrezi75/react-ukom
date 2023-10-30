@@ -13,6 +13,7 @@ const DashboardUser = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const roles = localStorage.getItem("roles");
 
   const [artikels, setArtikels] = useState([]);
 
@@ -46,6 +47,7 @@ const DashboardUser = () => {
     .then(() => {
 
         localStorage.removeItem("token");
+        localStorage.removeItem("roles");
 
         navigate('/dashboard');
         Swal.fire(

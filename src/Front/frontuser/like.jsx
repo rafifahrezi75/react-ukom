@@ -61,6 +61,7 @@ const Like = () => {
     .then(() => {
 
         localStorage.removeItem("token");
+        localStorage.removeItem("roles");
 
         navigate('/dashboard');
         Swal.fire(
