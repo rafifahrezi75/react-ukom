@@ -10,7 +10,6 @@ import Logo from "../assets/logo.png";
 
 import Swal from 'sweetalert2';
 import ReplyKomentar from "./komentar/replyKomentar";
-import axios from "axios";
 
 const ArtikelDetail = () => {
 
@@ -27,7 +26,7 @@ const ArtikelDetail = () => {
       formData.append('idartikel', idartikel);
       formData.append('iduser', user.id);
 
-      axios.post('http://127.0.0.1:8000/api/checklike', formData)
+      api.post('/api/checklike', formData)
         .then((response) => {
           const { liked } = response.data;
           setLiked(liked);  
@@ -82,7 +81,21 @@ const ArtikelDetail = () => {
           setKomentars(response.data.data);
         })
 
-    }
+    };
+
+  const [likes, setDataLikes] = useState([]);
+
+  const fetchDataLikes = async () => {
+
+    await api.get('/api/indexlike')
+        .then(response => {
+          setDataLikes(response.data.data);
+        })
+
+  };
+
+  const filteredLikesID = likes.filter(likes => likes.idartikel === parseInt(id));
+  const totalLikesCount = filteredLikesID.length;
 
   useEffect(() => {
 
@@ -111,6 +124,7 @@ const ArtikelDetail = () => {
       
     fetchDetailArtikel();
     fetchDataKomentars();
+    fetchDataLikes();
 
   }, []);
 
@@ -204,7 +218,7 @@ const ArtikelDetail = () => {
         formData.append('idartikel', idartikel);
         formData.append('iduser', user.id);
 
-        axios.post('http://127.0.0.1:8000/api/like', formData)
+        api.post('/api/like', formData)
           .then(() => {
             setLiked(true);
             Swal.fire(
@@ -237,7 +251,7 @@ const ArtikelDetail = () => {
       formData.append('iduser', user.id);
 
        // Buat permintaan ke server untuk unlike artikel ini
-      axios.post('http://127.0.0.1:8000/api/unlike', formData)
+      api.post('/api/unlike', formData)
         .then(() => {
           setLiked(false);
           Swal.fire(
@@ -309,6 +323,15 @@ const ArtikelDetail = () => {
                   }
                   {
                     token ? (
+                      <Link to="/like">
+                        <div className="text-white px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Like</div>
+                      </Link>
+                      ) : (
+                      null
+                    )
+                  }
+                  {
+                    token ? (
                       <button onClick={logoutHandler} className="bg-sky-600 rounded-md text-white my-3 px-2 py-0.5 lg:hover:scale-105 duration-300">
                           Logout
                       </button>
@@ -354,7 +377,7 @@ const ArtikelDetail = () => {
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-[#333333] bi bi-person" viewBox="0 0 16 16">
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
           </svg>
-          <p className="font-medium text-[#333333] dark:text-white">by : {penulis}</p>
+          <p className="font-medium text-[rgb(51,51,51)] dark:text-white">by : {penulis}</p>
         </div>
         <div className="flex m-4">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-slate-800 bi bi-calendar3" viewBox="0 0 16 16">
@@ -382,6 +405,9 @@ const ArtikelDetail = () => {
               </button>
             )
           }
+        </div>
+        <div className="flex m-4">
+          {totalLikesCount}
         </div>
       </div>
     </div>

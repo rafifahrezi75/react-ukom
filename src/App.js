@@ -23,6 +23,7 @@ import ProfileAdmin from "./Front/akun/profileAdmin";
 import RegisterUser from "./auth/registerUser";
 import LoginUser from "./auth/loginUser";
 import HistoryKomentar from "./Front/frontuser/historyKomentar";
+import Like from "./Front/frontuser/like";
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
       <Route path="/artikel/detail/:id" element={<ArtikelDetail />} />
       <Route path="/about" element={<AboutUser />} />
       <Route path="/historykomentar" element={<HistoryKomentar />} />
+      <Route path="/like" element={<Like />} />
 
     </Routes>
   );

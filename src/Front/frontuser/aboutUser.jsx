@@ -82,6 +82,15 @@ const AboutUser = () => {
                   }
                   {
                     token ? (
+                      <Link to="/like">
+                        <div className="text-white px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Like</div>
+                      </Link>
+                      ) : (
+                      null
+                    )
+                  }
+                  {
+                    token ? (
                       <button onClick={logoutHandler} className="bg-sky-600 rounded-md text-white my-3 px-2 py-0.5 lg:hover:scale-105 duration-300">
                           Logout
                       </button>

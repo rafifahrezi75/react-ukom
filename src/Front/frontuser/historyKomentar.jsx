@@ -25,7 +25,7 @@ const HistoryKomentar = () => {
 
         setUser(response.data);
     })
-};
+  };
 
   const logoutHandler = async () => {
 
@@ -131,6 +131,15 @@ const HistoryKomentar = () => {
                     }
                     {
                       token ? (
+                        <Link to="/like">
+                          <div className="text-white px-4 py-3 lg:py-5 lg:hover:bg-transparent hover:bg-sky-600">Like</div>
+                        </Link>
+                        ) : (
+                        null
+                      )
+                    }
+                    {
+                      token ? (
                         <button onClick={logoutHandler} className="bg-sky-600 rounded-md text-white my-3 px-2 py-0.5 lg:hover:scale-105 duration-300">
                             Logout
                         </button>
@@ -144,7 +153,7 @@ const HistoryKomentar = () => {
         </div>
       </div>
 
-      <div className="mt-10 mb-24 lg:mx-14 mx-4">
+      <div className="mt-10 mb-40 lg:mx-14 mx-4">
         <h2 className="mb-6 pb-4 text-center text-3xl font-semibold text-stone-800">
           History Komentar
         </h2>

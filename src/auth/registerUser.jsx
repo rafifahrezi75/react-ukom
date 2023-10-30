@@ -48,7 +48,7 @@ const RegisterUser = () => {
     <section className="bg-[#E2E2E2] min-h-screen flex items-center justify-center">
       <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-7 items-center">
         <div className="md:w-1/2 px-16">
-          <Link to="/">
+          <Link to="/loginuser">
             <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="gray" className="bi bi-arrow-left" viewBox="0 0 16 16">
               <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
             </svg>
@@ -96,7 +96,7 @@ const RegisterUser = () => {
           <hr className="my-8 border-gray-500" />
           <div className="mt-3 text-xs flex justify-between items-center">
             <p>Already have an account?</p>
-            <Link to="/">
+            <Link to="/loginuser">
               <button className="py-2 px-5 text-white bg-sky-600 border rounded-xl hover:scale-105 duration-300">Login</button>
             </Link>
           </div>
