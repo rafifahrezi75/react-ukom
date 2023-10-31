@@ -8,6 +8,8 @@ import Swal from "sweetalert2";
 import api from '../../api';
 import { useNavigate } from "react-router-dom";
 
+import { Link } from "react-router-dom";
+
 const Akun = () => {
 
     const [user, setUser] = useState({});
@@ -153,6 +155,11 @@ const Akun = () => {
 
           <div className="mt-4 mx-8">
             <div className="flex justify-start pb-2">
+              <Link to="/register" className="mr-2 px-4 py-2 text-sm bg-indigo-500 hover:bg-indigo-700 text-white rounded-md">
+                <p className="mt-0.5">
+                  New Admin
+                </p>
+              </Link>
               <button onClick={refresh} className="px-2 py-2 bg-yellow-500 hover:bg-yellow-700 rounded-md">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-6 h-6 text-white bi bi-arrow-clockwise" viewBox="0 0 16 16">
                   <path fillRule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />

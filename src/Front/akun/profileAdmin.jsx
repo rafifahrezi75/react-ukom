@@ -120,17 +120,31 @@ const ProfileAdmin = () => {
               <div class="flex items-center justify-center bg-white rounded-md">
                 <div className="mx-auto w-full p-8 justify-center items-center">
                   <div className="utama">
-                      <h2 className="text-center font-semibold text-2xl my-4 text-stone-800">
+                      <h2 className="font-semibold text-2xl my-4 text-stone-800">
                           Profil Saya
                       </h2>
                       <hr />
-                        <span className="inline-flex mx-[443px] my-8 items-center justify-center w-48 h-48 overflow-hidden bg-sky-500 rounded-full dark:bg-gray-600">
-                        <span className="font-medium text-8xl text-white dark:text-gray-300">
-                          {user?.name?.[0] || ''}
-                        </span>
-                        </span>
-                      <h1 className="text-center font-bold text-3xl mt-3 text-stone-800">{user.name}</h1>
-                      <p className="text-center text-sm mt-4 text-gray-600">{user.email}</p>
+                      <div className="flex">
+                        <div className="w-auto">
+                          <span className="inline-flex mx-auto my-8 items-center justify-center w-48 h-48 overflow-hidden bg-sky-500 rounded-full dark:bg-gray-600">
+                            <span className="font-medium text-8xl text-white dark:text-gray-300">
+                              {user?.name?.[0] || ''}
+                            </span>
+                          </span>
+                        </div>
+                        <div className="ml-32 flex">
+                          <div>
+                            <p className="font-semibold text-sm mt-12 text-gray-600">Name :</p>
+                            <h1 className="font-bold text-3xl text-gray-800 mt-2">{user.name}</h1>
+                            <p className="font-semibold text-sm mt-8 text-gray-600">Email :</p>
+                            <p className="font-bold text-3xl text-gray-800 mt-2">{user.email}</p>
+                          </div>
+                          <div className="ml-12">
+                            <p className="font-semibold text-sm mt-12 text-gray-600">Role :</p>
+                            <h1 className="font-bold text-3xl text-gray-800 mt-2 uppercase">{user.role}</h1>
+                          </div>
+                        </div>
+                      </div>
                   </div>
                 </div>
               </div>

@@ -128,6 +128,9 @@ const ArtikelDetail = () => {
   const filteredLikesID = likes.filter(likes => likes.idartikel === parseInt(id));
   const totalLikesCount = filteredLikesID.length;
 
+  const filteredKomentarsID = komentars.filter(komentars => komentars.idartikel === parseInt(id) && komentars.statuskomen === 3);
+  const totalKomentarsCount = filteredKomentarsID.length;
+
   const getRandomColorClass = () => {
     const colorClasses = ['bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 'bg-lime-500', 'bg-green-500',
     'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-indigo-500',' bg-violet-500',
@@ -173,6 +176,7 @@ const ArtikelDetail = () => {
         );
 
         setKomentar('');
+        fetchDataKomentars();
       } catch (error) {
         setErrors(error.response.data);
       }
@@ -208,6 +212,10 @@ const ArtikelDetail = () => {
   };
 
   const [ isOpen, setisOpen ] = useState(false);
+
+  const fetchKomen = () => {
+    fetchDataKomentars();
+  };
 
   const handleLike = () => {
 
@@ -375,13 +383,13 @@ const ArtikelDetail = () => {
 
       <div className="flex flex-row items-center text-center justify-between bg-neutral-100 rounded-t-md">
         <div className="flex m-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-[#333333] bi bi-person" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-[rgb(51,51,51)] dark:text-white bi bi-person" viewBox="0 0 16 16">
             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
           </svg>
           <p className="font-medium text-[rgb(51,51,51)] dark:text-white">by : {penulis}</p>
         </div>
         <div className="flex m-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-slate-800 bi bi-calendar3" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="w-5 h-5 mr-2 text-[rgb(51,51,51)] bi bi-calendar3" viewBox="0 0 16 16">
             <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z" />
             <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
           </svg>
@@ -391,26 +399,29 @@ const ArtikelDetail = () => {
         </div>
       </div>
       <div className="flex flex-row items-center text-center justify-between bg-neutral-100 rounded-b-md">
-        <div className="flex m-4">
-          {liked ? (
-              <button onClick={handleUnlike} className="inline-flex items-center justify-center w-10 h-10 text-sky-100 transition-colors duration-150 bg-sky-700 rounded-md focus:shadow-outline hover:bg-sky-800">
-                <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart-fill" viewBox="0 0 16 16">
-                  <path fillRule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-                </svg>
-              </button>
-            ) : (
-              <button onClick={handleLike} className="inline-flex items-center justify-center w-10 h-10 text-sky-100 transition-colors duration-150 bg-sky-700 rounded-md focus:shadow-outline hover:bg-sky-800">
-                <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart" viewBox="0 0 16 16">
-                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
-                </svg>
-              </button>
-            )
-          }
+        <div onClick={fetchKomen} className="flex m-4 cursor-pointer">
+          <svg className="w-5 h-5 mr-2 text-[rgb(51,51,51)] dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h5M5 8h2m6-3h2m-5 3h6m2-7H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h3v5l5-5h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z" />
+          </svg>
+          <p className="text-[rgb(51,51,51)] dark:text-white">
+            {totalKomentarsCount} Comments
+          </p>
         </div>
         <div className="flex m-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart w-5 h-5 mr-2 text-[rgb(51,51,51)] dark:text-white" viewBox="0 0 16 16">
-            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
-          </svg>
+          {liked ? (
+            <button onClick={handleUnlike}>
+              <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart-fill w-5 h-5 mr-2 text-[rgb(51,51,51)] dark:text-white" viewBox="0 0 16 16">
+                <path fillRule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+              </svg>
+            </button>
+          ) : (
+            <button onClick={handleLike}>
+              <svg xmlns="http://www.w3.org/2000/svg" width={16} height={16} fill="currentColor" className="bi bi-heart w-5 h-5 mr-2 text-[rgb(51,51,51)] dark:text-white" viewBox="0 0 16 16">
+                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+              </svg>
+            </button>
+          )
+          }
           <p className="text-[rgb(51,51,51)] dark:text-white">
             {totalLikesCount} Likes
           </p>

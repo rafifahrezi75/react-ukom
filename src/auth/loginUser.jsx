@@ -106,14 +106,6 @@ const LoginUser = () => {
               </div>
             )
           }
-          {/* <input disabled type="text" value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-4 px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Email" />
-          {
-            errors.role && (
-              <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                  <span className="font-medium">{errors.role[0]}</span>
-              </div>
-            )
-          } */}
           {
             errors.message  && (
               <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">

@@ -8,7 +8,6 @@ const Login = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    // const [role, setRole] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
     
@@ -65,7 +64,7 @@ const Login = () => {
         <h2 className="font-bold text-2xl mt-4">
           Login
         </h2>
-        <p className="text-sm mt-4">If You Already A User, Easily Log In </p>
+        <p className="text-sm mt-4">If You Already A Admin, Easily Log In </p>
         <form onSubmit={loginHandler} className="flex flex-col gap-4">
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full mt-4 px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Email" />
           {
@@ -99,14 +98,6 @@ const Login = () => {
               </div>
             )
           }
-          {/* <input type="text" value={role} onChange={(e) => setRole(e.target.value)} className="w-full mt-4 px-4 py-2 text-sm border rounded-md focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-600" placeholder="Type 'admin'" />
-          {
-            errors.role && (
-              <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                  <span className="font-medium">{errors.role[0]}</span>
-              </div>
-            )
-          } */}
           {
             errors.message  && (
               <div className="px-4 py-2 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
@@ -120,10 +111,7 @@ const Login = () => {
 
         <hr className="my-8 border-gray-500" />
         <div className="mt-3 text-xs flex justify-between items-center">
-          <p>Don't have an account?</p>
-          <Link to="/register">
-            <button className="py-2 px-5 text-white bg-sky-600 border rounded-xl hover:scale-105 duration-300">Register</button>
-          </Link>
+          <p>Only admin can login in this page!</p>
         </div>
       </div>
     </div>
