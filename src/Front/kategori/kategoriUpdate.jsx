@@ -97,7 +97,7 @@ const KategoriUpdate = () => {
             navigate('/admin/kategoris');
             Swal.fire(
               'Success!',
-              'Data Artikel Berhasil Diupdate!',
+              'Data Kategori Berhasil Diupdate!',
               'success'
           )
 

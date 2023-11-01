@@ -12,6 +12,10 @@ import Footer from '../../components/footer';
 
 const AllArtikel = () => {
 
+  const token = localStorage.getItem("token");
+  const roles = localStorage.getItem("roles");
+  const captcha = localStorage.getItem("_grecaptcha");
+
   const [search, setSearch] = useState('');
   const [filterKategori, setFilterKategori] = useState('');
 
@@ -67,8 +71,6 @@ const AllArtikel = () => {
 
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
-
   const logoutHandler = async () => {
 
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`
@@ -76,8 +78,9 @@ const AllArtikel = () => {
     await api.post('/api/logout')
     .then(() => {
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("roles");
+      localStorage.removeItem("token");
+      localStorage.removeItem("roles");
+      localStorage.removeItem("_grecaptcha");
 
         navigate('/dashboard');
         Swal.fire(
@@ -172,7 +175,7 @@ const AllArtikel = () => {
             </div>
             <input
             onChange={(e) => setSearch(e.target.value)}
-            type="search" id="search-artikels" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari Artikel..." required />
+            type="search" id="search-artikelall" className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Cari Artikel..." required />
           </div>
         </form>
 
@@ -226,7 +229,7 @@ const AllArtikel = () => {
                   </div>
                   <div className="p-6">
                     <p className={`text-sm font-semibold ${getRandomColorClass()} dark:text-primary-400`}>{artikels.kategori}</p>
-                    <h5 className="mb-3 text-lg font-bold text-stone-800">{artikels.judul}</h5>
+                    <h5 className="mb-3 text-lg font-bold text-stone-800 line-clamp-2">{artikels.judul}</h5>
                     <p className="mb-4 text-indigo-500 dark:text-white-300">
                       <small>Published <u>{artikels.tgl}</u> by
                       <span> {artikels.penulis}</span></small>

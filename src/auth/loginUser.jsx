@@ -3,12 +3,18 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import Swal from 'sweetalert2';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const LoginUser = () => {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    // const [role, setRole] = useState("user");
+    const [recaptchaValue, setRecaptchaValue] = useState(null);
+
+    const handleRecaptchaVerify = (value) => {
+      setRecaptchaValue(value);
+    };
+  
 
     const [showPassword, setShowPassword] = useState(false);
     
@@ -31,35 +37,37 @@ const LoginUser = () => {
     const loginHandler = async (e) => {
       e.preventDefault();
       
-      const formData = new FormData();
+      if (recaptchaValue) {
+        const formData = new FormData();
 
-      formData.append('email', email);
-      formData.append('password', password);
-      
-      await api.post('api/loginuser', formData)
-      .then((response) => {
+        formData.append('email', email);
+        formData.append('password', password);
+        
+        await api.post('api/loginuser', formData)
+        .then((response) => {
 
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('roles', response.data.role);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('roles', response.data.role);
 
-          const role = response.data.role;
+            navigate('/dashboard');
+            Swal.fire(
+              'Login Berhasil!',
+              `Selamat Datang ${response.data.user.name} !`,
+              'success'
+            );
 
-          if (role === 'admin') {
-              navigate('/admin/dashboard');
-          } else {
-              navigate('/dashboard');
-          }
-          Swal.fire(
-            'Success!',
-            'Login Berhasil !',
-            'success'
-        )
-
-      })
-      .catch(error => {
-          
-          setErrors(error.response.data);
-      })
+        })
+        .catch(error => {
+            
+            setErrors(error.response.data);
+        })
+      } else {
+        Swal.fire(
+          'Info!',
+          'Verifikasi Captcha Terlebih Dahulu !',
+          'warning'
+        );
+      };
 
   };
   return (
@@ -68,7 +76,7 @@ const LoginUser = () => {
       <div className="md:block hidden w-1/2 ">
         <img className="object-cover w-full h-full rounded-2xl" src="https://source.unsplash.com/user/erondu/500x800" alt="img" />
       </div> 
-      <div className="md:w-1/2 px-16">
+      <div className="md:w-2/2 px-16">
         <h2 className="font-bold text-2xl mt-4">
           Login
         </h2>
@@ -113,6 +121,11 @@ const LoginUser = () => {
               </div>
             )
           }
+          <ReCAPTCHA
+            sitekey={"6LcSf-coAAAAAOg5Q2EfUUjUbB8bIwzzX1sZShB0"}
+            onChange={handleRecaptchaVerify}
+            style={{ maxWidth: "100%" }}
+          />
           <button className="bg-sky-600 rounded-xl text-white py-2 hover:scale-105 duration-300">Login</button>
           
         </form>

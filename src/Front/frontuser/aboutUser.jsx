@@ -13,6 +13,8 @@ const AboutUser = () => {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
+  const roles = localStorage.getItem("roles");
+  const captcha = localStorage.getItem("_grecaptcha");
 
   const logoutHandler = async () => {
 
@@ -23,6 +25,7 @@ const AboutUser = () => {
 
         localStorage.removeItem("token");
         localStorage.removeItem("roles");
+        localStorage.removeItem("_grecaptcha");
 
         navigate('/dashboard');
         Swal.fire(

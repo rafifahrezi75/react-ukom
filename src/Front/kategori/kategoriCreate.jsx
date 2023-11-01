@@ -78,7 +78,7 @@ const KategoriCreate = () => {
             navigate('/admin/kategoris');
             Swal.fire(
               'Success!',
-              'Data Artikel Berhasil Ditambahkan!',
+              'Data Kategori Berhasil Ditambahkan!',
               'success'
           )
 

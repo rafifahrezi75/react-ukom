@@ -14,12 +14,13 @@ const DashboardUser = () => {
 
   const token = localStorage.getItem("token");
   const roles = localStorage.getItem("roles");
+  const captcha = localStorage.getItem("_grecaptcha");
 
   const [artikels, setArtikels] = useState([]);
 
   const fetchDataArtikels = async () => {
 
-    await api.get('/api/artikels')
+    await api.get('/api/indexartikel')
     .then(response => {
         
       setArtikels(response.data.data.data);
@@ -48,6 +49,7 @@ const DashboardUser = () => {
 
         localStorage.removeItem("token");
         localStorage.removeItem("roles");
+        localStorage.removeItem("_grecaptcha");
 
         navigate('/dashboard');
         Swal.fire(
@@ -186,7 +188,7 @@ const DashboardUser = () => {
                   </div>
                   <div className="p-6">
                     <p className={`text-sm font-semibold ${getRandomColorClass()} dark:text-primary-400`}>{artikels.kategori}</p>
-                    <h5 className="mb-3 text-lg font-bold text-stone-800">{artikels.judul}</h5>
+                    <h5 className="mb-3 text-lg font-bold text-stone-800 line-clamp-2">{artikels.judul}</h5>
                     <p className="mb-4 text-indigo-500 dark:text-white-300">
                       <small>Published <u>{artikels.tgl}</u> by
                       <span> {artikels.penulis}</span></small>
